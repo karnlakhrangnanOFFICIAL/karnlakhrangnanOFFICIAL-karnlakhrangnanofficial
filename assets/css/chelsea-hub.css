@@ -324,6 +324,63 @@
   border-left: 4px solid #38bdf8;
 }
 
+/* Clickable Finished Match Rows in Table */
+.hub-table tbody tr.hub-match-row-clickable {
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.hub-table tbody tr.hub-match-row-clickable:hover {
+  background: rgba(56, 189, 248, 0.12) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 51, 160, 0.3);
+}
+
+.hub-table tbody tr.hub-match-row-clickable:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: -2px;
+  background: rgba(56, 189, 248, 0.16) !important;
+}
+
+.hub-status-finished.is-clickable {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.4), rgba(56, 189, 248, 0.22));
+  color: #bae6fd;
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.hub-match-row-clickable:hover .hub-status-finished.is-clickable {
+  background: linear-gradient(135deg, #0033a0, #2563eb);
+  color: #ffffff;
+  border-color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+  transform: scale(1.05);
+}
+
+.hub-status-view-cta {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  opacity: 0.9;
+  margin-left: 2px;
+  transition: transform 0.2s ease;
+}
+
+.hub-match-row-clickable:hover .hub-status-view-cta {
+  opacity: 1;
+  transform: translateX(3px);
+}
+
 /* Team Row Elements */
 .hub-team-cell {
   display: flex;

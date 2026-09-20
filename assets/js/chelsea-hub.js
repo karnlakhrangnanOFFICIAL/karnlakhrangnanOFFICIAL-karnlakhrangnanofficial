@@ -19,6 +19,7 @@
   // Shared Data Cache
   const HubState = {
     matches: [],
+    localFixtures: [],
     standings: [],
     squad: [],
     coach: null,
@@ -109,6 +110,47 @@
     return 'L';
   }
 
+  // Helper to find corresponding fixture ID in local fixtures.json
+  function findMatchingFixtureId(m) {
+    if (!m) return 'm9';
+    if (m.id && typeof m.id === 'string' && (m.id.startsWith('m') || m.id.startsWith('w'))) {
+      return m.id;
+    }
+    if (HubState.localFixtures && HubState.localFixtures.length > 0) {
+      const matchDateStr = m.utcDate ? m.utcDate.split('T')[0] : (m.date || '');
+      const homeName = (m.homeTeam?.name || m.homeTeam?.shortName || m.home_team || '').toLowerCase();
+      const awayName = (m.awayTeam?.name || m.awayTeam?.shortName || m.away_team || '').toLowerCase();
+
+      // 1. Exact date match with home or away opponent
+      const foundByDate = HubState.localFixtures.find(fix => {
+        if (fix.date !== matchDateStr) return false;
+        const fHome = (fix.home_team || '').toLowerCase();
+        const fAway = (fix.away_team || '').toLowerCase();
+        return (fHome.includes(homeName.substring(0, 4)) || homeName.includes(fHome.substring(0, 4))) ||
+               (fAway.includes(awayName.substring(0, 4)) || awayName.includes(fAway.substring(0, 4)));
+      });
+      if (foundByDate) return foundByDate.id;
+
+      // 2. Opponent match (home or away)
+      const foundByOpponent = HubState.localFixtures.find(fix => {
+        const fHome = (fix.home_team || '').toLowerCase();
+        const fAway = (fix.away_team || '').toLowerCase();
+        const isChelseaMatch = fHome.includes('chelsea') || fAway.includes('chelsea');
+        if (!isChelseaMatch) return false;
+        return (fHome.includes(homeName.substring(0, 4)) || homeName.includes(fHome.substring(0, 4))) &&
+               (fAway.includes(awayName.substring(0, 4)) || awayName.includes(fAway.substring(0, 4)));
+      });
+      if (foundByOpponent) return foundByOpponent.id;
+
+      // 3. Fallback to latest completed match
+      const completedList = HubState.localFixtures.filter(fix => fix.status === 'completed');
+      if (completedList.length > 0) {
+        return completedList[0].id;
+      }
+    }
+    return m.id || 'm9';
+  }
+
   // ==========================================================================
   // 1. LIVE MATCH RESULTS AUTOMATIC HTML TABLE
   // ==========================================================================
@@ -126,6 +168,16 @@
     `;
 
     try {
+      // Pre-load local fixtures for rich match detail links
+      try {
+        const fRes = await fetch('data/fixtures.json');
+        if (fRes.ok) {
+          HubState.localFixtures = await fRes.json();
+        }
+      } catch (e) {
+        console.warn('Could not load local fixtures.json:', e);
+      }
+
       const data = await fetchFootballData(`teams/${CHELSEA_TEAM_ID}/matches`);
       HubState.matches = data.matches || [];
       renderMatchesTable();
@@ -211,9 +263,10 @@
       const isChelseaHome = m.homeTeam.id === CHELSEA_TEAM_ID;
       const isChelseaAway = m.awayTeam.id === CHELSEA_TEAM_ID;
       const outcome = getChelseaOutcome(m);
+      const isFinished = m.status === 'FINISHED';
 
       let scoreBadgeHtml = '';
-      if (m.status === 'FINISHED') {
+      if (isFinished) {
         const homeScore = m.score?.fullTime?.home ?? '-';
         const awayScore = m.score?.fullTime?.away ?? '-';
         const badgeClass = outcome === 'W' ? 'win' : outcome === 'D' ? 'draw' : outcome === 'L' ? 'loss' : '';
@@ -229,20 +282,36 @@
 
       let statusClass = 'hub-status-scheduled';
       let statusLabel = m.status;
-      if (m.status === 'FINISHED') {
-        statusClass = 'hub-status-finished';
-        statusLabel = 'จบการแข่งขัน';
+      let rowAttrs = '';
+
+      if (isFinished) {
+        const targetFixtureId = findMatchingFixtureId(m);
+        const detailHref = `match-detail.html?id=${targetFixtureId}`;
+        const matchTitle = `${m.homeTeam.shortName || m.homeTeam.name} vs ${m.awayTeam.shortName || m.awayTeam.name}`;
+
+        statusClass = 'hub-status-finished is-clickable';
+        statusLabel = `จบการแข่งขัน <span class="hub-status-view-cta">↗</span>`;
+        rowAttrs = `
+          class="hub-match-row-clickable ${outcome === 'W' ? 'row-highlight' : ''}" 
+          data-href="${detailHref}" 
+          tabindex="0" 
+          role="link" 
+          title="คลิกเพื่อดูรายละเอียดแมตช์เต็ม (${matchTitle})" 
+          aria-label="ดูรายละเอียดแมตช์ ${matchTitle}"
+        `;
       } else if (m.status === 'IN_PLAY' || m.status === 'PAUSED') {
         statusClass = 'hub-status-live';
         statusLabel = 'กำลังแข่งขัน';
+        rowAttrs = `class="${outcome === 'W' ? 'row-highlight' : ''}"`;
       } else {
         statusLabel = 'ยังไม่เริ่ม';
+        rowAttrs = `class="${outcome === 'W' ? 'row-highlight' : ''}"`;
       }
 
       const compEmblem = m.competition?.emblem ? `<img src="${m.competition.emblem}" class="hub-comp-emblem" alt="" />` : '';
 
       return `
-        <tr class="${outcome === 'W' ? 'row-highlight' : ''}">
+        <tr ${rowAttrs}>
           <td style="white-space: nowrap; font-size: 0.85rem; color: #93c5fd;">
             ${formatMatchDate(m.utcDate)}
             ${m.matchday ? `<div style="font-size: 0.75rem; color: rgba(255,255,255,0.45);">Matchday ${m.matchday}</div>` : ''}
@@ -276,6 +345,24 @@
     }).join('');
 
     tableBody.innerHTML = rowsHtml;
+
+    // Attach click and keyboard listeners for clickable match rows
+    tableBody.onclick = (e) => {
+      const row = e.target.closest('tr.hub-match-row-clickable');
+      if (row && row.dataset.href) {
+        window.location.href = row.dataset.href;
+      }
+    };
+
+    tableBody.onkeydown = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        const row = e.target.closest('tr.hub-match-row-clickable');
+        if (row && row.dataset.href) {
+          e.preventDefault();
+          window.location.href = row.dataset.href;
+        }
+      }
+    };
   }
 
   // ==========================================================================
@@ -407,13 +494,26 @@
         const isChelseaHome = m.homeTeam.id === CHELSEA_TEAM_ID;
         const isChelseaAway = m.awayTeam.id === CHELSEA_TEAM_ID;
         const outcome = getChelseaOutcome(m);
+        const isFinished = m.status === 'FINISHED';
 
         let badgeClass = outcome === 'W' ? 'win' : outcome === 'D' ? 'draw' : outcome === 'L' ? 'loss' : '';
         const homeScore = m.score?.fullTime?.home ?? '-';
         const awayScore = m.score?.fullTime?.away ?? '-';
+        const targetFixtureId = isFinished ? findMatchingFixtureId(m) : null;
+        const detailHref = isFinished ? `match-detail.html?id=${targetFixtureId}` : '';
+        const matchTitle = `${m.homeTeam.shortName || m.homeTeam.name} vs ${m.awayTeam.shortName || m.awayTeam.name}`;
+
+        const rowAttrs = isFinished ? `
+          class="hub-match-row-clickable ${outcome === 'W' ? 'row-highlight' : ''}" 
+          data-href="${detailHref}" 
+          tabindex="0" 
+          role="link" 
+          title="คลิกเพื่อดูรายละเอียดแมตช์ (${matchTitle})"
+          aria-label="ดูรายละเอียดแมตช์ ${matchTitle}"
+        ` : '';
 
         return `
-          <tr>
+          <tr ${rowAttrs}>
             <td style="font-size: 0.85rem; color: #93c5fd;">${formatMatchDate(m.utcDate)}</td>
             <td style="font-size: 0.82rem;">${m.competition?.name || 'Tournament'}</td>
             <td>
@@ -434,6 +534,24 @@
           </tr>
         `;
       }).join('');
+
+      // Attach click and keyboard listeners for manager matches table
+      matchesTable.onclick = (e) => {
+        const row = e.target.closest('tr.hub-match-row-clickable');
+        if (row && row.dataset.href) {
+          window.location.href = row.dataset.href;
+        }
+      };
+
+      matchesTable.onkeydown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          const row = e.target.closest('tr.hub-match-row-clickable');
+          if (row && row.dataset.href) {
+            e.preventDefault();
+            window.location.href = row.dataset.href;
+          }
+        }
+      };
     }
   }
 
@@ -1418,8 +1536,22 @@
                   const badgeClass = outcome === 'W' ? 'win' : outcome === 'D' ? 'draw' : outcome === 'L' ? 'loss' : '';
                   const homeScore = m.score?.fullTime?.home ?? '-';
                   const awayScore = m.score?.fullTime?.away ?? '-';
+                  const isFinished = m.status === 'FINISHED';
+                  const targetFixtureId = isFinished ? findMatchingFixtureId(m) : null;
+                  const detailHref = isFinished ? `match-detail.html?id=${targetFixtureId}` : '';
+                  const matchTitle = `${m.homeTeam.shortName || m.homeTeam.name} vs ${m.awayTeam.shortName || m.awayTeam.name}`;
+
+                  const rowAttrs = isFinished ? `
+                    class="hub-match-row-clickable ${outcome === 'W' ? 'row-highlight' : ''}" 
+                    data-href="${detailHref}" 
+                    tabindex="0" 
+                    role="link" 
+                    title="คลิกเพื่อดูรายละเอียดแมตช์ (${matchTitle})"
+                    aria-label="ดูรายละเอียดแมตช์ ${matchTitle}"
+                  ` : '';
+
                   return `
-                    <tr>
+                    <tr ${rowAttrs}>
                       <td style="font-size: 0.85rem; color: #93c5fd;">${formatMatchDate(m.utcDate)}</td>
                       <td style="font-size: 0.82rem;">${m.competition?.name || 'Tournament'}</td>
                       <td>
@@ -1438,8 +1570,8 @@
                         </div>
                       </td>
                       <td>
-                        <span class="hub-status-pill ${m.status === 'FINISHED' ? 'hub-status-finished' : 'hub-status-scheduled'}">
-                          ${m.status === 'FINISHED' ? 'จบการแข่งขัน' : 'โปรแกรมแข่งขัน'}
+                        <span class="hub-status-pill ${isFinished ? 'hub-status-finished is-clickable' : 'hub-status-scheduled'}">
+                          ${isFinished ? 'จบการแข่งขัน <span class="hub-status-view-cta">↗</span>' : 'โปรแกรมแข่งขัน'}
                         </span>
                       </td>
                     </tr>
@@ -1451,6 +1583,27 @@
         </div>
       </div>
     `;
+
+    // Attach click and keyboard listeners for H2H table
+    const h2hTableBody = container.querySelector('tbody');
+    if (h2hTableBody) {
+      h2hTableBody.onclick = (e) => {
+        const row = e.target.closest('tr.hub-match-row-clickable');
+        if (row && row.dataset.href) {
+          window.location.href = row.dataset.href;
+        }
+      };
+
+      h2hTableBody.onkeydown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          const row = e.target.closest('tr.hub-match-row-clickable');
+          if (row && row.dataset.href) {
+            e.preventDefault();
+            window.location.href = row.dataset.href;
+          }
+        }
+      };
+    }
   }
 
   // ==========================================================================

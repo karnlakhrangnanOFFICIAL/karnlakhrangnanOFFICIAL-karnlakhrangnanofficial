@@ -5795,7 +5795,7 @@
     "date": "2026-09-19",
     "time": "18:45",
     "time_th": "18:45",
-    "time_uk": "TBC",
+    "time_uk": "12:45",
     "competition": "Barclays Women's Super League",
     "competition_logo": "databases/logo/competitions/women/women_super_league.png",
     "home_team": "Chelsea Women",
@@ -5803,19 +5803,344 @@
     "away_team": "Birmingham City",
     "away_logo": "databases/logo/teams/england_birmingham.svg",
     "venue": "Stamford Bridge",
+    "attendance": 4820,
+    "referee": "Grace Lowe",
     "ha": "H",
     "channels": [
       {
-        "platform": "Sky Sports",
-        "name": "Sky Sports",
+        "platform": "Sky Sports / BBC Two",
+        "name": "Sky Sports / BBC Two",
         "logo": "databases/logo/tv/sky_sports.svg"
       }
     ],
-    "status": "upcoming",
-    "home_score": null,
-    "away_score": null,
-    "goals": [],
-    "events": [],
+    "status": "completed",
+    "home_score": 2,
+    "away_score": 0,
+    "period": "FullTime",
+    "clock": "90+5'",
+    "youtube_id": "RbVJ1nl3ksE",
+    "video": {
+      "id": "RbVJ1nl3ksE",
+      "title": "Chelsea 2-0 Birmingham City | Barclays WSL 2026-27",
+      "desc_th": "ไฮไลท์การแข่งขัน เชลซี วูเมน 2-0 เบอร์มิงแฮม ซิตี้ | บาร์เคลย์ส วีเมนส์ ซูเปอร์ลีก 2026/27",
+      "desc_en": "Chelsea 2-0 Birmingham City | Barclays WSL 2026-27",
+      "credit": "Thank you to Barclays Women's Super League channel for the official match highlights.",
+      "channel_name": "Barclays Women's Super League",
+      "channel_handle": "@BarclaysWSL",
+      "channel_url": "https://www.youtube.com/@BarclaysWSL"
+    },
+    "goals": [
+      {
+        "team": "home",
+        "player": "Lexi Potter",
+        "minute": 8,
+        "assist": "Alyssa Thompson"
+      },
+      {
+        "team": "home",
+        "player": "Melvine Malard",
+        "minute": 71
+      }
+    ],
+    "events": [
+      {
+        "type": "goal",
+        "team": "home",
+        "player": "Lexi Potter",
+        "minute": 8,
+        "detail": "Assist: Alyssa Thompson"
+      },
+      {
+        "type": "substitution",
+        "team": "home",
+        "player_in": "Melvine Malard",
+        "player_out": "Sandy Baltimore",
+        "player": "Melvine Malard",
+        "minute": 63
+      },
+      {
+        "type": "substitution",
+        "team": "away",
+        "player_in": "Suzu Amano",
+        "player_out": "Lee Geum-Min",
+        "player": "Suzu Amano",
+        "minute": 66
+      },
+      {
+        "type": "goal",
+        "team": "home",
+        "player": "Melvine Malard",
+        "minute": 71,
+        "detail": "Goal"
+      },
+      {
+        "type": "substitution",
+        "team": "away",
+        "player_in": "Veatriki Sarri",
+        "player_out": "Lily Crosthwaite",
+        "player": "Veatriki Sarri",
+        "minute": 77
+      },
+      {
+        "type": "substitution",
+        "team": "home",
+        "player_in": "Nathalie Björn",
+        "player_out": "Kadeisha Buchanan",
+        "player": "Nathalie Björn",
+        "minute": 87
+      },
+      {
+        "type": "substitution",
+        "team": "home",
+        "player_in": "Giulia Dragoni",
+        "player_out": "Sjoeke Nüsken",
+        "player": "Giulia Dragoni",
+        "minute": 87
+      },
+      {
+        "type": "substitution",
+        "team": "home",
+        "player_in": "Katie McCabe",
+        "player_out": "Alyssa Thompson",
+        "player": "Katie McCabe",
+        "minute": 87
+      },
+      {
+        "type": "yellow_card",
+        "team": "home",
+        "player": "Keira Walsh",
+        "minute": "90+1",
+        "detail": "Foul"
+      }
+    ],
+    "lineups": {
+      "home": {
+        "manager": "Sonia Bompastor",
+        "formation": "3-4-2-1",
+        "starting": [
+          {
+            "number": 24,
+            "name": "Hannah Hampton (GK)"
+          },
+          {
+            "number": 2,
+            "name": "Ellie Carpenter"
+          },
+          {
+            "number": 5,
+            "name": "Veerle Buurman"
+          },
+          {
+            "number": 4,
+            "name": "Kadeisha Buchanan"
+          },
+          {
+            "number": 22,
+            "name": "Lucy Bronze (C)"
+          },
+          {
+            "number": 18,
+            "name": "Keira Walsh"
+          },
+          {
+            "number": 19,
+            "name": "Wieke Kaptein"
+          },
+          {
+            "number": 6,
+            "name": "Sjoeke Nüsken"
+          },
+          {
+            "number": 32,
+            "name": "Lexi Potter"
+          },
+          {
+            "number": 11,
+            "name": "Sandy Baltimore"
+          },
+          {
+            "number": 12,
+            "name": "Alyssa Thompson"
+          }
+        ],
+        "substitutes": [
+          {
+            "number": 1,
+            "name": "Livia Peng (GK)"
+          },
+          {
+            "number": 30,
+            "name": "Becky Spencer (GK)"
+          },
+          {
+            "number": 7,
+            "name": "Katie McCabe"
+          },
+          {
+            "number": 16,
+            "name": "Giulia Dragoni"
+          },
+          {
+            "number": 14,
+            "name": "Nathalie Björn"
+          },
+          {
+            "number": 15,
+            "name": "Naomi Girma"
+          },
+          {
+            "number": 9,
+            "name": "Melvine Malard"
+          },
+          {
+            "number": 17,
+            "name": "Nelly Las"
+          },
+          {
+            "number": 23,
+            "name": "Maika Hamano"
+          }
+        ]
+      },
+      "away": {
+        "manager": "Amy Merricks",
+        "formation": "4-2-3-1",
+        "starting": [
+          {
+            "number": 1,
+            "name": "Sophie Baggaley (GK)"
+          },
+          {
+            "number": 12,
+            "name": "Marie Levasseur"
+          },
+          {
+            "number": 4,
+            "name": "Millie Turner (C)"
+          },
+          {
+            "number": 14,
+            "name": "Neve Herron"
+          },
+          {
+            "number": 2,
+            "name": "Rebecca McKenna"
+          },
+          {
+            "number": 8,
+            "name": "Asato Miyagawa"
+          },
+          {
+            "number": 16,
+            "name": "Lisa Naalsund"
+          },
+          {
+            "number": 10,
+            "name": "Lee Geum-Min"
+          },
+          {
+            "number": 11,
+            "name": "Lily Crosthwaite"
+          },
+          {
+            "number": 7,
+            "name": "Océane Hurtré"
+          },
+          {
+            "number": 9,
+            "name": "Wilma Leidhammar"
+          }
+        ],
+        "substitutes": [
+          {
+            "number": 28,
+            "name": "Lucy Thomas (GK)"
+          },
+          {
+            "number": 3,
+            "name": "Martha Harris"
+          },
+          {
+            "number": 5,
+            "name": "Jade Rastocle"
+          },
+          {
+            "number": 6,
+            "name": "Gemma Cooke"
+          },
+          {
+            "number": 15,
+            "name": "Suzu Amano"
+          },
+          {
+            "number": 17,
+            "name": "Libby Holloway"
+          },
+          {
+            "number": 18,
+            "name": "Chelsea Cornet"
+          },
+          {
+            "number": 20,
+            "name": "Chancelle Effa Effa"
+          },
+          {
+            "number": 22,
+            "name": "Veatriki Sarri"
+          }
+        ]
+      },
+      "officials": [
+        {
+          "role": "Referee",
+          "name": "Grace Lowe"
+        }
+      ]
+    },
+    "stats": [
+      {
+        "name": "การครองบอล (Possession)",
+        "home": 68,
+        "away": 32,
+        "isPercentage": true
+      },
+      {
+        "name": "โอกาสยิงทั้งหมด (Total Shots)",
+        "home": 18,
+        "away": 5,
+        "isPercentage": false
+      },
+      {
+        "name": "ยิงตรงกรอบ (Shots on Target)",
+        "home": 8,
+        "away": 2,
+        "isPercentage": false
+      },
+      {
+        "name": "ความแม่นยำในการส่งบอล (Pass Accuracy)",
+        "home": 88,
+        "away": 71,
+        "isPercentage": true
+      },
+      {
+        "name": "เตะมุม (Corner Kicks)",
+        "home": 7,
+        "away": 2,
+        "isPercentage": false
+      },
+      {
+        "name": "ทำฟาวล์ (Fouls)",
+        "home": 7,
+        "away": 9,
+        "isPercentage": false
+      },
+      {
+        "name": "ใบเหลือง (Yellow Cards)",
+        "home": 1,
+        "away": 0,
+        "isPercentage": false
+      }
+    ],
     "competition_name": "WSL",
     "team_type": "W"
   },
